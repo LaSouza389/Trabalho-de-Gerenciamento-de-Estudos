@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> agenda de estudos</tMinhaitle>
+</head>
+<body>
+    <h1>Agenda de Estudos de {{ session["usuario_nome"] }}</h1>
+    <h2> Adicionar Estudo </h2>
+    
+    <form action= "/adicionar_estudo" method= "POST">
+        <label for="materia"> Matéria: </label>
+        <input type="text" id="materia" name="materia" required>
+
+        <br><br>
+
+        <label for="descricao"> Descrição </label>
+        <input type ="text" id="descricao" name="descricao">
+
+        <br><br>
+
+        <label for="data"> Data </label>
+        <input type="date" id="data" name="data">
+
+        <br><br>
+
+        <button type="submit"> Adicionar estudo </button>
+    </form>
+
+    <hr>
+
+    <h2> Meus Estudos </h2>
+
+    {% if estudos %}
+
+        {% for estudo in estudos %}
+
+            <div>
+                <h3>{{ estudo.materia }}</h3>
+
+                <p>{{ estudo.descricao }}</p>
+
+                <p>Data {{ estudo.data }}</p>
+
+                <p>
+                    Concluído:
+                    {% if estudo.concluido %}
+                        sim
+                    {% else %}
+                        Não
+                    {% endif %}
+                </p>
+                {% if not estudo.concluido %}
+
+                <form action="/concluir_estudo/{{ estudo.id }}" method="POST">
+                    <button type="submit"> Marcar como concluído </button>
+                </form>
+            {% endif %}
+                <form action="/excluir_estudo/{{ estudo.id }}" method="POST">
+                    <button type="submit"> Excluir estudo </button>
+                </form>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p> Você ainda não possui estudos cadastrados.</p>
+    {% endif %}
+
+</body>
+</html>
