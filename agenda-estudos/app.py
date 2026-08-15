@@ -13,7 +13,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///agenda.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
 
 # INICIALIZA O SQLAalchemy DENTRO DA MINHA APLICAÇÃO FLASK
-db = SQLAlchemy(app)
+db = SQLAlchemy(app) 
 
 # CRIAÇÃO DA TABELA DE USUARIOS E AS COLUNAS INTERNAS (a id ,nome, email e senha )
 class Usuario(db.Model):
