@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> agenda de estudos</tMinhaitle>
+    <title> agenda de estudos</title>
 </head>
 <body>
-    <h1>Agenda de Estudos de {{ session["usuario_nome"] }}</h1>
+    <h1>Agenda de Estudos de {{ usuario.nome }}</h1>
+
+    <!-- Filtros -->
+    <div>
+        <a href="/agenda?filtro=todos">📚 Todos</a>
+        <a href="/agenda?filtro=pendentes">⏳ Pendentes</a>
+        <a href="/agenda?filtro=concluidos">✅ Concluídos</a>
+    </div>
+
     <h2> Adicionar Estudo </h2>
     
     <form action= "/adicionar_estudo" method= "POST">
@@ -20,7 +28,7 @@
 
         <br><br>
 
-        <label for="data"> Data </label>
+        <label for="data"> Data: </label>
         <input type="date" id="data" name="data">
 
         <br><br>
@@ -35,6 +43,10 @@
     {% if estudos %}
 
         {% for estudo in estudos %}
+
+        {% if estudo.atrasado %}
+            <strong> ATRASADO! </strong>
+        {% endif %}
 
             <div>
                 <h3>{{ estudo.materia }}</h3>

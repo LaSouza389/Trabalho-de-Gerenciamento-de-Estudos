@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session # 
 from flask_sqlalchemy import SQLAlchemy # Importação do SQLAlchemy para o DB
 from sqlalchemy import Column, Integer, String # Importação de algumas funcionalidades do DB
 from werkzeug.security import generate_password_hash , check_password_hash
+from datetime import date
 
 # SESSAO Q CRIA A INSTANCIA PRINCIPAL DO FLASK
 app = Flask(__name__)
@@ -77,29 +78,70 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/agenda") 
+@app.route("/agenda")
 def agenda():
-    if "usuario_id" not in session:
-        return redirect(url_for("login"))
 
-    estudos = Estudo.query.all()
+    filtro = request.args.get("filtro", "todos")
 
-    return render_template("agenda.html", estudos=estudos
+    usuario_id = session["usuario_id"]
+
+    if filtro == "pendentes":
+        estudos = Estudo.query.filter_by(
+            usuario_id=usuario_id,
+            concluido=False
+        ).all()
+
+    elif filtro == "concluidos":
+        estudos = Estudo.query.filter_by(
+            usuario_id=usuario_id,
+            concluido=True
+        ).all()
+
+    else:
+        estudos = Estudo.query.filter_by(
+            usuario_id=usuario_id
+        ).all()
+
+    # Verifica quais estudos estão atrasados
+    for estudo in estudos:
+
+        if estudo.data and estudo.data != "Sem data final":
+
+            data_entrega = date.fromisoformat(estudo.data)
+
+            if data_entrega < date.today() and not estudo.concluido:
+                estudo.atrasado = True
+            else:
+                estudo.atrasado = False
+
+        else:
+            estudo.atrasado = False
+
+    usuario = Usuario.query.get(session["usuario_id"])
+
+    return render_template(
+        "agenda.html",
+        estudos=estudos,
+        usuario=usuario
     )
-
 
 @app.route("/adicionar_estudo", methods=["POST"])
 def adicionar_estudo():
 
     materia = request.form["materia"]
     descricao = request.form["descricao"]
-    data = request.form["data"]
+    data = request.form.get("data")
+
+    if not data:
+        data = "Sem data final"
+
+    usuario_id = session["usuario_id"]
 
     estudo = Estudo(
         materia=materia,
         descricao=descricao,
-        data=data, 
-        usuario_id=session["usuario_id"]
+        data=data,
+        usuario_id=usuario_id
     )
 
     db.session.add(estudo)
@@ -107,15 +149,17 @@ def adicionar_estudo():
 
     return redirect(url_for("agenda"))
 
-
 @app.route("/concluir_estudo/<int:id>", methods=["POST"])
 def concluir_estudo(id):
 
-    estudo = Estudo.query.get(id)
+    estudo = Estudo.query.filter_by(
+        id=id,
+        usuario_id=session["usuario_id"]
+    ).first()
 
-    estudo.concluido = True
-
-    db.session.commit()
+    if estudo:
+        estudo.concluido = True
+        db.session.commit()
 
     return redirect(url_for("agenda"))
 
@@ -123,10 +167,14 @@ def concluir_estudo(id):
 @app.route("/excluir_estudo/<int:id>", methods=["POST"])
 def excluir_estudo(id):
 
-    estudo = Estudo.query.get(id)
+    estudo = Estudo.query.filter_by (
+        id=id,
+        usuario_id=session["usuario_id"]
+        ).first()
 
-    db.session.delete(estudo)
-    db.session.commit()
+    if estudo:
+        db.session.delete(estudo)
+        db.session.commit()
 
     return redirect(url_for("agenda"))
 
@@ -140,4 +188,4 @@ print(app.url_map)
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=5000, debug=True) # TIVE Q ESCREVER MANUALMENTE PQ TAVA DANDO BUGS
 
-    
+  
