@@ -8,6 +8,7 @@
 <body>
     <h1>Agenda de Estudos de {{ usuario.nome }}</h1>
 
+    <a href="/logout"> Sair</a>
     <!-- Filtros -->
     <div>
         <a href="/agenda?filtro=todos">📚 Todos</a>
@@ -45,7 +46,7 @@
         {% for estudo in estudos %}
 
         {% if estudo.atrasado %}
-            <strong> ATRASADO! </strong>
+            <strong> ⚠️ ATRASADO! </strong>
         {% endif %}
 
             <div>

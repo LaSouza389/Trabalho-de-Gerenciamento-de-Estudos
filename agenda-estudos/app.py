@@ -55,7 +55,7 @@ def cadastro():
 
     return render_template("cadastro.html")
 
-
+# Rota Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -77,21 +77,36 @@ def login():
     
     return render_template("login.html")
 
+# Rota Logout
+@app.route("/logout")
+def logout():
 
+    session.clear()
+
+    return redirect(url_for("login"))
+
+# Rota Agenda
 @app.route("/agenda")
 def agenda():
+
+    #Se a pessoa n estiver logada ela vai ser mandada p Login
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
 
     filtro = request.args.get("filtro", "todos")
 
     usuario_id = session["usuario_id"]
 
+
     if filtro == "pendentes":
+
         estudos = Estudo.query.filter_by(
             usuario_id=usuario_id,
             concluido=False
         ).all()
 
     elif filtro == "concluidos":
+
         estudos = Estudo.query.filter_by(
             usuario_id=usuario_id,
             concluido=True
@@ -101,6 +116,24 @@ def agenda():
         estudos = Estudo.query.filter_by(
             usuario_id=usuario_id
         ).all()
+
+
+    # Organiza estudos por prioridade
+    def prioridade(estudo):
+
+        if not estudo.data or estudo.data == "Sem data final":
+            return (2, "9999-12-31")  # Sem data final, prioridade menor
+
+
+        # Verifica quais estudos estão atrasados
+        data_entrega = date.fromisoformat(estudo.data)   
+
+        if data_entrega < date.today() and not estudo.concluido:
+            return (0, estudo.data)  # Ta Atrasado
+
+        return (1, estudo.data)  # N ta atrasado
+
+    estudos.sort(key=prioridade) # Ordena por priordade
 
     # Verifica quais estudos estão atrasados
     for estudo in estudos:
@@ -125,8 +158,13 @@ def agenda():
         usuario=usuario
     )
 
+# Rota Adicionar Estudo
 @app.route("/adicionar_estudo", methods=["POST"])
 def adicionar_estudo():
+
+    # Verifica se está logado
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
 
     materia = request.form["materia"]
     descricao = request.form["descricao"]
@@ -149,29 +187,42 @@ def adicionar_estudo():
 
     return redirect(url_for("agenda"))
 
+# Rota Concluir Estudo
 @app.route("/concluir_estudo/<int:id>", methods=["POST"])
 def concluir_estudo(id):
 
+    # Verifica se está logado
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+    
+     # Filtra o estudo pelo ID e pelo usuário logado
     estudo = Estudo.query.filter_by(
         id=id,
         usuario_id=session["usuario_id"]
     ).first()
 
+    # Se encontrou o Estudo, marca ele como concluído
     if estudo:
         estudo.concluido = True
         db.session.commit()
 
     return redirect(url_for("agenda"))
 
-
+# Rota Excluir Estudo
 @app.route("/excluir_estudo/<int:id>", methods=["POST"])
 def excluir_estudo(id):
 
+    # Verifica se está logado
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+
+    # Filtra o estudo pelo ID e pelo usuário logado
     estudo = Estudo.query.filter_by (
         id=id,
         usuario_id=session["usuario_id"]
         ).first()
-
+    
+    # Se encontrou o Estudo, deleta ele do banco de dados
     if estudo:
         db.session.delete(estudo)
         db.session.commit()
