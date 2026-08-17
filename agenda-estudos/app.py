@@ -31,6 +31,7 @@ class Estudo(db.Model):
     data = db.Column(db.String(20))
     concluido = db.Column(db.Boolean, default=False)
     usuario_id = db.Column(db.Integer, nullable=True)
+    secao = db.Column(db.String(100), nullable=False)
 
 
 @app.route("/cadastro", methods = ["GET" , "POST"])
@@ -169,17 +170,22 @@ def adicionar_estudo():
     materia = request.form["materia"]
     descricao = request.form["descricao"]
     data = request.form.get("data")
+    secao = request.form["secao"]
 
+    # Se n existir a data
     if not data:
         data = "Sem data final"
 
     usuario_id = session["usuario_id"]
 
+    # 
     estudo = Estudo(
         materia=materia,
         descricao=descricao,
         data=data,
-        usuario_id=usuario_id
+        usuario_id=usuario_id,
+        secao=secao
+    
     )
 
     db.session.add(estudo)
@@ -230,13 +236,13 @@ def excluir_estudo(id):
     return redirect(url_for("agenda"))
 
 
-# CRIANDO O BANCO DE DADOS
+# Criando o DB
 with app.app_context():
     db.create_all()
 
-# EXECUTA TUDO 
+# Executa td
 print(app.url_map)
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=5000, debug=True) # TIVE Q ESCREVER MANUALMENTE PQ TAVA DANDO BUGS
+   app.run(host="0.0.0.0", port=5000, debug=True) 
 
   
