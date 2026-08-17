@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy # Importação do SQLAlchemy para o DB
 from sqlalchemy import Column, Integer, String # Importação de algumas funcionalidades do DB
 from werkzeug.security import generate_password_hash , check_password_hash
 from datetime import date
+from sqlalchemy.exc import IntegrityError
 
 # SESSAO Q CRIA A INSTANCIA PRINCIPAL DO FLASK
 app = Flask(__name__)
@@ -40,6 +41,12 @@ def cadastro():
         nome = request.form["nome"]
         email = request.form["email"]
         senha = request.form["senha"]
+
+        # Verifica se o email já está cadastrado
+        usuario_existente = Usuario.query.filter_by(email=email).first()
+
+        if usuario_existente:
+            return "Email já cadastrado. Por favor, use outro email."
 
         # Encryptando..
         senha_hash = generate_password_hash(senha)
@@ -213,6 +220,51 @@ def concluir_estudo(id):
         db.session.commit()
 
     return redirect(url_for("agenda"))
+# Rota Editar Estudo
+# Rota Editar Estudo
+@app.route("/editar_estudo/<int:id>", methods=["GET", "POST"])
+def editar_estudo(id):
+
+    # Verifica se está logado
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+
+    # Filtra o estudo pelo ID e pelo usuário logado
+    estudo = Estudo.query.filter_by(
+        id=id,
+        usuario_id=session["usuario_id"]
+    ).first()
+
+    # Se o estudo não existir ou não pertencer ao usuário
+    if not estudo:
+        return redirect(url_for("agenda"))
+
+    # Quando clicar em "Salvar alterações"
+    if request.method == "POST":
+
+        estudo.materia = request.form["materia"]
+        estudo.descricao = request.form["descricao"]
+
+        data = request.form.get("data")
+
+        if not data:
+            estudo.data = "Sem data final"
+        else:
+            estudo.data = data
+
+        estudo.secao = request.form["secao"]
+
+        db.session.commit()
+
+        return redirect(url_for("agenda"))
+
+    # Quando apenas abrir a página de edição
+    return render_template(
+        "editar_estudo.html",
+        estudo=estudo
+    )
+
+                                            
 
 # Rota Excluir Estudo
 @app.route("/excluir_estudo/<int:id>", methods=["POST"])

@@ -70,7 +70,7 @@
 
                 <p>{{ estudo.descricao }}</p>
 
-                <p>Data {{ estudo.data }}</p>
+                <p>Data: {{ estudo.data }}</p>
 
                 <p>
                     Concluído:
@@ -86,8 +86,11 @@
                     <button type="submit"> Marcar como concluído </button>
                 </form>
             {% endif %}
+                <a href="/editar_estudo/{{ estudo.id }}">
+                    ✏️ Editar
+                </a>"
                 <form action="/excluir_estudo/{{ estudo.id }}" method="POST">
-                    <button type="submit"> Excluir estudo </button>
+                    <button type="submit"> 🗑️ Excluir </button>
                 </form>
 
             </div>
