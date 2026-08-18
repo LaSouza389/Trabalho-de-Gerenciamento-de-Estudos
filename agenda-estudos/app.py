@@ -105,6 +105,12 @@ def agenda():
 
     usuario_id = session["usuario_id"]
 
+    total_estudos = Estudo.query.filter_by(usuario_id=usuario_id).count()
+
+    estudos_concluidos = Estudo.query.filter_by(usuario_id=usuario_id, concluido=True).count()
+
+    estudos_pendentes = Estudo.query.filter_by(usuario_id=usuario_id, concluido=False).count()
+
 
     if filtro == "pendentes":
 
@@ -163,7 +169,10 @@ def agenda():
     return render_template(
         "agenda.html",
         estudos=estudos,
-        usuario=usuario
+        usuario=usuario,
+        total_estudos=total_estudos,
+        estudos_concluidos=estudos_concluidos,
+        estudos_pendentes=estudos_pendentes
     )
 
 # Rota Adicionar Estudo

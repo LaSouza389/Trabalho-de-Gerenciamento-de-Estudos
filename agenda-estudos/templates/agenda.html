@@ -8,13 +8,31 @@
 <body>
     <h1>Agenda de Estudos de {{ usuario.nome }}</h1>
 
+    <div class="contadores"> 
+        
+       
+        <a href="/agenda?filtro=todos" class="contador">
+            <span>📚</span>
+            <strong> {{ total_estudos}} </strong>
+            <small>Total</small>
+        </a>
+
+        <a href="/agenda?filtro=concluidos" class="contador">
+            <span>✅</span>
+            <strong> {{ estudos_concluidos }} </strong>
+            <small>Concluídos</small>
+        </a>
+
+        <a href="/agenda?filtro=pendentes" class="contador">
+            <span>⏳</span>
+            <strong> {{ estudos_pendentes }}</strong>
+            <small>Pendentes</small>
+       </a>
+    </div>
+
     <a href="/logout"> Sair</a>
     <!-- Filtros -->
-    <div>
-        <a href="/agenda?filtro=todos">📚 Todos</a>
-        <a href="/agenda?filtro=pendentes">⏳ Pendentes</a>
-        <a href="/agenda?filtro=concluidos">✅ Concluídos</a>
-    </div>
+
 
     <h2> Adicionar Estudo </h2>
     
@@ -88,7 +106,7 @@
             {% endif %}
                 <a href="/editar_estudo/{{ estudo.id }}">
                     ✏️ Editar
-                </a>"
+                </a>
                 <form action="/excluir_estudo/{{ estudo.id }}" method="POST">
                     <button type="submit"> 🗑️ Excluir </button>
                 </form>
