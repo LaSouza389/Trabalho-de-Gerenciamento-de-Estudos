@@ -1,4 +1,61 @@
+/* CONFIGURACOES GERAIS: */
+
+*{ 
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f6fb;
+    color: #222;
+}
+
+/* Título: */
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h2{
+    margin-top: 30px
+}
+
+/* Contadores / Filtros */
+
+.contadores {
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    color: #222;
+    background-color: white;
+    border-radius: 15px;
+    border: 2px solid #ddd;
+    transition: 0.2s;
+}
+.contador:hover {
+    transform: translateY(-4px);
+}
+.contador span {
+    font-size: 25px;
+}
+.contador strong {
+    font-size: 28px;
+}
+.contador small {
+    font-size: 14px;
+}
+
+/* Formulário */
+form {
+    margin-bottom: 15px;
+}
 input {
-    width: 220px;
-    padding: 10px;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+
+
 }

@@ -34,7 +34,12 @@ class Estudo(db.Model):
     usuario_id = db.Column(db.Integer, nullable=True)
     secao = db.Column(db.String(100), nullable=False)
 
+# Rota Boas Vindas
+@app.route("/") # Primeira rota do site
+def inicio():
+    return render_template("index.html")
 
+# Rota Cadastro
 @app.route("/cadastro", methods = ["GET" , "POST"])
 def cadastro():
     if request.method == "POST":
@@ -304,6 +309,6 @@ with app.app_context():
 # Executa td
 print(app.url_map)
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=5000, debug=True) 
+   app.run(debug=True) 
 
   
